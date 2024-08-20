@@ -21,7 +21,7 @@ type LatencyCheckerOutputList struct {
 	Result []LatencyCheckerOutput `json:"result", yaml:"result"`
 }
 
-type tokenAPIResponse struct {
+type TokenAPIResponse struct {
 	RequestCount int `json:"request_count"`
 	Duration     int `json:"duration"`
 }

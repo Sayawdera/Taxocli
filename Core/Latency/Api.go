@@ -5,21 +5,102 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"log"
 	"net/http"
+	"sort"
 	"strconv"
-
-	"github.com/rs/zerolog/log"
+	"time"
 )
 
 func (this *LatencyChecker) RunCommandExec() (LatencyCheckerOutputList, error) {
+	AvailableTokens, err := this.DoGetTokenRequest()
+	if err != nil {
+		switch AvailableTokens {
+		case -1:
+			log.Println(" [ ERROR ]: Detected When Running The Request To The Token API")
+			break
+		case -2:
+			log.Println(" [ ERROR ]: Detected When Trying To Decode API Response")
+			break
+		case -3:
+			log.Println(" [ ERROR ]: Unexpected HTTP Response Code")
+			break
+		default:
+			log.Println(" [ ERROR ]: Unexpected")
+			break
+		}
+		return LatencyCheckerOutputList{}, err
+	}
+	RequiredTokens := this.GetRuns() * Config.TAXOCLI_LATENCY_TOKENS_COST
+	log.Printf(" [ INFO ]: Required Tokens For This Execution { %d }, Available Tokens: { %d } ", RequiredTokens, AvailableTokens)
 
+	if AvailableTokens < RequiredTokens {
+		return LatencyCheckerOutputList{}, errors.New(" [ ERROR ]: Insufficient Tokens")
+	}
+	time.Sleep(Config.TAXOCLI_API_THROTTLER_TIME * time.Second)
+	LatencyResults := make(map[string]float64)
+	log.Printf(" [ INFO ]: Sleeping { %d }s Between Latency Requests Tests", this.GetWaitInterval())
+
+	for I := 1; I < this.GetRuns(); I++ {
+		log.Printf(" [ INFO ]: Request Number { [%d/%d] }", I, this.GetRuns())
+		ResponseLatencyCheck, err := this.DoPostLatencyCheckRequest()
+
+		if err != nil {
+			log.Printf(" [ ERROR ]: Doing Latency Check Request")
+			return LatencyCheckerOutputList{}, err
+		}
+
+		for KV, VK := range ResponseLatencyCheck {
+			Latency := VK.(map[string]interface{})["Latency"]
+			StatusCode := VK.(map[string]interface{})["StatusCode"]
+
+			if StatusCode.(float64) != 200 {
+				Latency = 1000
+			}
+			LatencyResults[KV] += Latency.(float64)
+		}
+
+		if this.GetRuns() > 1 {
+			time.Sleep(time.Duration(this.GetWaitInterval()) * time.Second)
+		}
+	}
+
+	var (
+		OutputList LatencyCheckerOutputList
+		Output     LatencyCheckerOutput
+	)
+	BestLocation, AvgLatencies := this.GetMinimumLatencies(LatencyResults)
+
+	for I := 0; I < this.GetOutputLocationsNumber(); I++ {
+		Output.AvgLatency = AvgLatencies[I]
+		Output.Location = BestLocation[I]
+		OutputList.Result = append(OutputList.Result, Output)
+	}
+	return OutputList, nil
 }
 
-func (this *LatencyCheckerOutputList) DeepCopyInto() *LatencyCheckerOutputList {
+func (this *LatencyCheckerOutputList) DeepCopyInto(Output *LatencyCheckerOutputList) {
+	*Output = *this
+
+	if this.Result != nil {
+		this, Output := &this.Result, &Output.Result
+		*Output = make([]LatencyCheckerOutput, len(*this))
+
+		for I := range *this {
+			(*Output)[I] = (*this)[I]
+		}
+
+	}
 
 }
 func (this *LatencyCheckerOutputList) DeepCopy() *LatencyCheckerOutputList {
 
+	if this == nil {
+		return nil
+	}
+	Output := new(LatencyCheckerOutputList)
+	this.DeepCopyInto(Output)
+	return Output
 }
 
 func (this *LatencyChecker) DoGetTokenRequest() (int, error) {
@@ -32,7 +113,7 @@ func (this *LatencyChecker) DoGetTokenRequest() (int, error) {
 	}
 	Request.Header.Add("X-API-KEY", this.GetAPIKey())
 	Response, _ := http.DefaultClient.Do(Request)
-	BodyResponse := &tokenAPIResponse{}
+	BodyResponse := &TokenAPIResponse{}
 	Derr := json.NewDecoder(Response.Body).Decode(BodyResponse)
 	if Derr != nil {
 		return -2, Derr
@@ -100,5 +181,24 @@ func (this *LatencyChecker) DoPostLatencyCheckRequest() (map[string]interface{},
 }
 
 func (this *LatencyChecker) GetMinimumLatencies(Latencies map[string]float64) ([]string, []float64) {
+	OutputKeys := make([]string, len(Latencies))
+	OutputLatency := make([]float64, len(Latencies))
+	Keys := make([]string, 0, len(Latencies))
 
+	for K := range Latencies {
+		Keys = append(Keys, K)
+	}
+	sort.SliceStable(Keys, func(i, j int) bool {
+		return Latencies[Keys[i]] < Latencies[Keys[j]]
+	})
+
+	if this.GetOutputLocationsNumber() > len(Latencies) {
+		this.SetOutputLocationsNumber(len(Latencies))
+	}
+
+	for I := 0; I < this.GetOutputLocationsNumber(); I++ {
+		OutputKeys[I] = Keys[I]
+		OutputLatency[I] = Latencies[Keys[I]]
+	}
+	return OutputKeys, OutputLatency
 }
