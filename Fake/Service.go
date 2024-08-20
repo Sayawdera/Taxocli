@@ -1,6 +1,8 @@
 package Fake
 
 import (
+	"Taxocli/Config"
+	"fmt"
 	"math/rand"
 	"strconv"
 	"strings"
@@ -10,88 +12,88 @@ import (
 	"github.com/jaswdr/faker"
 )
 
-func (this Faker) RandomBoolean() bool {
+func (this Faker) TocliRandomBoolean() bool {
 	return faker.NewWithSeed(rand.NewSource(time.Now().UnixNano())).Bool()
 }
-func (this Faker) RandomInt() int {
+func (this Faker) TocliRandomInt() int {
 	return faker.NewWithSeed(rand.NewSource(time.Now().UnixNano())).IntBetween(0, 1000)
 }
-func (this Faker) RandomStringMaxLenght(l int) string {
+func (this Faker) TocliRandomStringMaxLenght(l int) string {
 	return faker.NewWithSeed(rand.NewSource(time.Now().UnixNano())).RandomStringWithLength(l)
 }
-func (this Faker) RandomFloatBetween(maxDecimals, min, max int) float64 {
+func (this Faker) TocliRandomFloatBetween(maxDecimals, min, max int) float64 {
 	return faker.NewWithSeed(rand.NewSource(time.Now().UnixNano())).RandomFloat(maxDecimals, min, max)
 }
-func (this Faker) RandomIntBetween(min, max int) int {
+func (this Faker) TocliRandomIntBetween(min, max int) int {
 	return faker.NewWithSeed(rand.NewSource(time.Now().UnixNano())).IntBetween(min, max)
 }
-func (this Faker) RandomUUID() uuid.UUID {
+func (this Faker) TocliRandomUUID() uuid.UUID {
 	return uuid.New()
 }
-func (this Faker) CurrentISOTimestamp() string {
+func (this Faker) TocliCurrentISOTimestamp() string {
 	return time.Now().UTC().Format("2006-01-02T15:04:05.000Z")
 }
-func (this Faker) CurrentTimestamp() int64 {
+func (this Faker) TocliCurrentTimestamp() int64 {
 	return time.Now().UTC().Unix()
 }
-func (this Faker) RandomGuid() uuid.UUID {
+func (this Faker) TocliRandomGuid() uuid.UUID {
 	return uuid.New()
 }
-func (this Faker) RandomAddressLongitude() float64 {
+func (this Faker) TocliRandomAddressLongitude() float64 {
 	return faker.NewWithSeed(rand.NewSource(time.Now().UnixNano())).Address().Longitude()
 }
-func (this Faker) RandomAddressLatitude() float64 {
+func (this Faker) TocliRandomAddressLatitude() float64 {
 	return faker.NewWithSeed(rand.NewSource(time.Now().UnixNano())).Address().Longitude()
 }
-func (this Faker) RandomAddressCountry() string {
+func (this Faker) TocliRandomAddressCountry() string {
 	return faker.NewWithSeed(rand.NewSource(time.Now().UnixNano())).Address().Country()
 }
-func (this Faker) RandomAddressStreetAddress() string {
+func (this Faker) TocliRandomAddressStreetAddress() string {
 	return faker.NewWithSeed(rand.NewSource(time.Now().UnixNano())).Address().StreetAddress()
 }
-func (this Faker) RandomAddresStreetName() string {
+func (this Faker) TocliRandomAddresStreetName() string {
 	return faker.NewWithSeed(rand.NewSource(time.Now().UnixNano())).Address().StreetName()
 }
-func (this Faker) RandomAddressCity() string {
+func (this Faker) TocliRandomAddressCity() string {
 	return faker.NewWithSeed(rand.NewSource(time.Now().UnixNano())).Address().City()
 }
-func (this Faker) RandomPersonNameSuffix() string {
+func (this Faker) TocliRandomPersonNameSuffix() string {
 	return faker.NewWithSeed(rand.NewSource(time.Now().UnixNano())).Person().Suffix()
 }
-func (this Faker) RandomPersonNamePrefix() string {
+func (this Faker) TocliRandomPersonNamePrefix() string {
 	return faker.NewWithSeed(rand.NewSource(time.Now().UnixNano())).Person().Title()
 }
-func (this Faker) RandomPersonFullName() string {
+func (this Faker) TocliRandomPersonFullName() string {
 	return faker.NewWithSeed(rand.NewSource(time.Now().UnixNano())).Person().Name()
 }
-func (this Faker) RandomPersonLastName() string {
+func (this Faker) TocliRandomPersonLastName() string {
 	return faker.NewWithSeed(rand.NewSource(time.Now().UnixNano())).Person().LastName()
 }
-func (this Faker) RandomPersonFirstName() string {
+func (this Faker) TocliRandomPersonFirstName() string {
 	return faker.NewWithSeed(rand.NewSource(time.Now().UnixNano())).Person().FirstName()
 }
-func (this Faker) RandomUserAgent() string {
+func (this Faker) TocliRandomUserAgent() string {
 	return faker.NewWithSeed(rand.NewSource(time.Now().UnixNano())).UserAgent().UserAgent()
 }
-func (this Faker) RandomLocale() string {
+func (this Faker) TocliRandomLocale() string {
 	return faker.NewWithSeed(rand.NewSource(time.Now().UnixNano())).Language().Language()
 }
-func (this Faker) RandomPassword() string {
+func (this Faker) TocliRandomPassword() string {
 	return faker.NewWithSeed(rand.NewSource(time.Now().UnixNano())).Internet().Password()
 }
-func (this Faker) RandomMACAddress() string {
+func (this Faker) TocliRandomMACAddress() string {
 	return faker.NewWithSeed(rand.NewSource(time.Now().UnixNano())).Internet().MacAddress()
 }
-func (this Faker) RandomIP() string {
+func (this Faker) TocliRandomIP() string {
 	return faker.NewWithSeed(rand.NewSource(time.Now().UnixNano())).Internet().Ipv4()
 }
-func (this Faker) RandomSafeColorHex() string {
+func (this Faker) TocliRandomSafeColorHex() string {
 	return faker.NewWithSeed(rand.NewSource(time.Now().UnixNano())).Color().Hex()
 }
-func (this Faker) RandomSafeColorName() string {
+func (this Faker) TocliRandomSafeColorName() string {
 	return faker.NewWithSeed(rand.NewSource(time.Now().UnixNano())).Color().SafeColorName()
 }
-func (this Faker) RandomDateFuture() string {
+func (this Faker) TocliRandomDateFuture() string {
 	min := time.Now().Unix()
 	max := time.Now().Unix() * 10 / 9
 	delta := max - min
@@ -99,7 +101,7 @@ func (this Faker) RandomDateFuture() string {
 	randTime := time.Unix(sec, 0)
 	return randTime.Format(time.UnixDate)
 }
-func (this Faker) RandomDatePast() string {
+func (this Faker) TocliRandomDatePast() string {
 	min := time.Now().Unix() - (time.Now().Unix() * 2 / 10)
 	max := time.Now().Unix()
 	delta := max - min
@@ -107,7 +109,7 @@ func (this Faker) RandomDatePast() string {
 	randTime := time.Unix(sec, 0)
 	return randTime.Format(time.UnixDate)
 }
-func (this Faker) RandomDateRecent() string {
+func (this Faker) TocliRandomDateRecent() string {
 	min := time.Now().Unix() - (time.Now().Unix() * 1 / 200)
 	max := time.Now().Unix()
 	delta := max - min
@@ -115,313 +117,399 @@ func (this Faker) RandomDateRecent() string {
 	randTime := time.Unix(sec, 0)
 	return randTime.Format(time.UnixDate)
 }
-func (this Faker) RandomLoremWord() string {
-	return LoremWords[this.Generator.Intn(len(LoremWords))]
+func (this Faker) TocliRandomLoremWord() string {
+	return Config.LoremWords[this.Generator.Intn(len(Config.LoremWords))]
 }
-func (this Faker) RandomLoremWords() string {
+func (this Faker) TocliRandomLoremWords() string {
 	words := ""
 	size := this.Generator.Intn(6-2) + 2
 	for i := 0; i < size; i++ {
-		words += this.RandomLoremWord() + " "
+		words += this.TocliRandomLoremWord() + " "
 	}
 	return words
 }
-func (this Faker) RandomLoremSentence() string {
+func (this Faker) TocliRandomLoremSentence() string {
 	words := ""
 	size := this.Generator.Intn(6-2) + 2
 	for i := 0; i < size; i++ {
-		words += this.RandomLoremWord() + " "
+		words += this.TocliRandomLoremWord() + " "
 	}
 	return strings.TrimSpace(words) + "."
 }
-func (this Faker) RandomPhrase() string {
-	return this.RandomLoremSentence()
+func (this Faker) TocliRandomPhrase() string {
+	return this.TocliRandomLoremSentence()
 }
-func (this Faker) RandomLoremSentences() string {
+func (this Faker) TocliRandomLoremSentences() string {
 	words := ""
 	size := this.Generator.Intn(6-2) + 2
 	for i := 0; i < size; i++ {
-		words += this.RandomLoremSentence() + " "
+		words += this.TocliRandomLoremSentence() + " "
 	}
 	return words
 }
-func (this Faker) RandomLoremLines() string {
+func (this Faker) TocliRandomLoremLines() string {
 	words := ""
 	size := this.Generator.Intn(6-2) + 2
 	for i := 0; i < size; i++ {
-		words += this.RandomLoremSentence() + "\n"
+		words += this.TocliRandomLoremSentence() + "\n"
 	}
 	return words
 }
-func (this Faker) RandomLoremParagraph() string {
+func (this Faker) TocliRandomLoremParagraph() string {
 	words := ""
 	size := this.Generator.Intn(6-2) + 2
 	for i := 0; i < size; i++ {
-		words += this.RandomLoremSentence() + "\n"
+		words += this.TocliRandomLoremSentence() + "\n"
 	}
 	return words
 }
-func (this Faker) RandomLoremText() string {
-	return this.RandomLoremParagraphs()
+func (this Faker) TocliRandomLoremText() string {
+	return this.TocliRandomLoremParagraphs()
 }
-func (this Faker) RandomLoremParagraphs() string {
+func (this Faker) TocliRandomLoremParagraphs() string {
 	words := ""
 	size := this.Generator.Intn(6-2) + 2
 	for i := 0; i < size; i++ {
-		words += this.RandomLoremSentence() + "\n"
+		words += this.TocliRandomLoremSentence() + "\n"
 	}
 	return words
 }
-func (this Faker) RandomLoremSlug() string {
-	return this.RandomLoremWord() + "-" + this.RandomLoremWord() + "-" + this.RandomLoremWord()
+func (this Faker) TocliRandomLoremSlug() string {
+	return this.TocliRandomLoremWord() + "-" + this.TocliRandomLoremWord() + "-" + this.TocliRandomLoremWord()
 }
-func (this Faker) RandomNoun() string {
-	return Nouns[this.Generator.Intn(len(Nouns))]
+func (this Faker) TocliRandomNoun() string {
+	return Config.Nouns[this.Generator.Intn(len(Config.Nouns))]
 }
-func (this Faker) RandomVerb() string {
-	return Verbs[this.Generator.Intn(len(Verbs))]
+func (this Faker) TocliRandomVerb() string {
+	return Config.Verbs[this.Generator.Intn(len(Config.Verbs))]
 }
-func (this Faker) RandomIngVerb() string {
-	return IngVerbs[this.Generator.Intn(len(IngVerbs))]
+func (this Faker) TocliRandomIngVerb() string {
+	return Config.IngVerbs[this.Generator.Intn(len(Config.IngVerbs))]
 }
-func (this Faker) RandomAdjective() string {
-	return Adjectives[this.Generator.Intn(len(Adjectives))]
+func (this Faker) TocliRandomAdjective() string {
+	return Config.Adjectives[this.Generator.Intn(len(Config.Adjectives))]
 }
-func (this Faker) RandomWord() string {
-	words := append(append(append(Adjectives, IngVerbs...), Verbs...), Nouns...)
+func (this Faker) TocliRandomWord() string {
+	words := append(append(append(Config.Adjectives, Config.IngVerbs...), Config.Verbs...), Config.Nouns...)
 	return words[this.Generator.Intn(len(words))]
 }
-func (this Faker) RandomWords() string {
+func (this Faker) TocliRandomWords() string {
 	words := ""
 	size := this.Generator.Intn(6-2) + 2
 	for i := 0; i < size; i++ {
-		words += this.RandomWord() + " "
+		words += this.TocliRandomWord() + " "
 	}
 	return words
 }
-func (this Faker) RandomDepartment() string {
-	return StoreDepartaments[this.Generator.Intn(len(StoreDepartaments))]
+func (this Faker) TocliRandomDepartment() string {
+	return Config.StoreDepartments[this.Generator.Intn(len(Config.StoreDepartments))]
 }
-func (this Faker) RandomProductName() string {
-	return this.RandomAdjective() + " " + this.RandomProductMaterial() + " " + this.RandomProduct()
+func (this Faker) TocliRandomProductName() string {
+	return this.TocliRandomAdjective() + " " + this.TocliRandomProductMaterial() + " " + this.TocliRandomProduct()
 }
-func (this Faker) RandomProductMaterial() string {
-	return ProductMaterials[this.Generator.Intn(len(ProductMaterials))]
+func (this Faker) TocliRandomProductMaterial() string {
+	return Config.ProductMaterials[this.Generator.Intn(len(Config.ProductMaterials))]
 }
-func (this Faker) RandomProductAdjective() string {
-	return ProductAdjectives[this.Generator.Intn(len(ProductAdjectives))]
+func (this Faker) TocliRandomProductAdjective() string {
+	return Config.ProductAdjectives[this.Generator.Intn(len(Config.ProductAdjectives))]
 }
-func (this Faker) RandomProduct() string {
-	return Products[this.Generator.Intn(len(Products))]
+func (this Faker) TocliRandomProduct() string {
+	return Config.Products[this.Generator.Intn(len(Config.Products))]
 }
-func (this Faker) RandomPrice() string {
+func (this Faker) TocliRandomPrice() string {
 	return strconv.Itoa(this.Generator.Intn(1000)) + " " + strconv.Itoa(this.Generator.Intn(99-10)+100)
 }
-func (this Faker) RandomFilePath() string {
-	return this.RandomDirectoryPath() + "/" + this.RandomDomainWord()
+func (this Faker) TocliRandomFilePath() string {
+	return this.TocliRandomDirectoryPath() + "/" + this.TocliRandomDomainWord()
 }
-func (this Faker) RandomMimeType() string {
-	return CommonMimeTypes[this.Generator.Intn(len(CommonMimeTypes))]
+func (this Faker) TocliRandomMimeType() string {
+	return Config.CommonMimeTypes[this.Generator.Intn(len(Config.CommonMimeTypes))]
 }
-func (this Faker) RandomDirectoryPath() string {
-	return DirectoryPaths[this.Generator.Intn(len(DirectoryPaths))]
+func (this Faker) TocliRandomDirectoryPath() string {
+	return Config.DirectoryPaths[this.Generator.Intn(len(Config.DirectoryPaths))]
 }
-func (this Faker) RandomCommonFileExtension() string {
-	return CommonFileExtensions[this.Generator.Intn(len(CommonFileExtensions))]
+func (this Faker) TocliRandomCommonFileExtension() string {
+	return Config.CommonFileExtensions[this.Generator.Intn(len(Config.CommonFileExtensions))]
 }
-func (this Faker) RandomCommonFileType() string {
-	return CommonFIleTypes[this.Generator.Intn(len(CommonFIleTypes))]
+func (this Faker) TocliRandomCommonFileType() string {
+	return Config.CommonFileTypes[this.Generator.Intn(len(Config.CommonFileTypes))]
 }
-func (this Faker) RandomCommonFileName() string {
-	return this.RandomDomainWord() + "." + this.RandomCommonFileExtension()
+func (this Faker) TocliRandomCommonFileName() string {
+	return this.TocliRandomDomainWord() + "." + this.TocliRandomCommonFileExtension()
 }
-func (this Faker) RandomFileType() string {
-	return FileTypes[this.Generator.Intn(len(FileTypes))]
+func (this Faker) TocliRandomFileType() string {
+	return Config.FileTypes[this.Generator.Intn(len(Config.FileTypes))]
 }
 func (this Faker) RandomFileExtension() string {
-	return FileExtensions[this.Generator.Intn(len(FileExtensions))]
+	return Config.FileExtensions[this.Generator.Intn(len(Config.FileExtensions))]
 }
-func (this Faker) RandomFileName() string {
-	return strings.ToLower(FirstNames[this.Generator.Intn(len(FirstNames))])+"_"+LastNames[this.Generator.Intn(len(LastNames))]+ "." this.RandomFileExtension()
+func (this Faker) TocliRandomFileName() string {
+	return strings.ToLower(Config.FirstNames[this.Generator.Intn(len(Config.FirstNames))]) + "_" + Config.LastNames[this.Generator.Intn(len(Config.LastNames))] + "." + this.RandomFileExtension()
 }
-func (this Faker) RandomUrl() string {
-	return this.RandomProtocol() + "://" + strings.ToLower(FirstNames[this.Generator.Intn(len(FirstNames))]+ "_"+LastNames[this.Generator.Intn(len(LastNames))]) + "." + 
-	this.RandomFileExtension()
+func (this Faker) TocliRandomUrl() string {
+	return this.TocliRandomProtocol() + "://" + strings.ToLower(Config.FirstNames[this.Generator.Intn(len(Config.FirstNames))]+"_"+Config.LastNames[this.Generator.Intn(len(Config.LastNames))]) + "." +
+		this.RandomFileExtension()
 }
-func (this Faker) RandomUsername() string {
-	return FirstNames[this.Generator.Intn(len(FirstNames))]+"."+LastNames[this.Generator.Intn(len(LastNames))]
+func (this Faker) TocliRandomUsername() string {
+	return Config.FirstNames[this.Generator.Intn(len(Config.FirstNames))] + "." + Config.LastNames[this.Generator.Intn(len(Config.LastNames))]
 }
 func (this Faker) RandomExampleEmail() string {
-		return stirngs.ToLower(FirstNames[this.Generator.Intn(len(FirstNames))]+"_"+LastNames[this.Generator.Intn(len(LastNames))])+"@"+this.RandomDomainName()
+	return strings.ToLower(Config.FirstNames[this.Generator.Intn(len(Config.FirstNames))]+"_"+Config.LastNames[this.Generator.Intn(len(Config.LastNames))]) + "@" + this.TocliRandomDomainName()
 }
-func (this Faker) RandomEmail() string {
-
+func (this Faker) TocliRandomEmail() string {
+	return strings.ToLower(Config.FirstNames[this.Generator.Intn(len(Config.FirstNames))])
 }
-func (this Faker) RandomDomainWord() string {
-
+func (this Faker) TocliRandomDomainWord() string {
+	return strings.ToLower(Config.FirstNames[this.Generator.Intn(len(Config.FirstNames))] + Config.FirstNames[this.Generator.Intn(len(Config.LastNames))])
 }
-func (this Faker) RandomDomainSuffix() string {
-
+func (this Faker) TocliRandomDomainSuffix() string {
+	return Config.DomainSuffixes[this.Generator.Intn(len(Config.DomainSuffixes))]
 }
-func (this Faker) RandomDomainName() string {
-
+func (this Faker) TocliRandomDomainName() string {
+	return strings.ToLower(Config.FirstNames[this.Generator.Intn(len(Config.FirstNames))] + Config.LastNames[this.Generator.Intn(len(Config.LastNames))])
 }
-func (this Faker) RandomMonth() string {
-
+func (this Faker) TocliRandomMonth() string {
+	return Config.Months[this.Generator.Intn(len(Config.Months))]
 }
-func (this Faker) RandomWeekday() string {
-
+func (this Faker) TocliRandomWeekday() string {
+	return Config.WeekDays[this.Generator.Intn(len(Config.WeekDays))]
 }
-func (this Faker) RandomDatabaseColumn() string {
-
+func (this Faker) TocliRandomDatabaseColumn() string {
+	return Config.DatabaseColumns[this.Generator.Intn(len(Config.DatabaseColumns))]
 }
-func (this Faker) RandomDatabaseType() string {
-
+func (this Faker) TocliRandomDatabaseType() string {
+	return Config.DatabaseTypes[this.Generator.Intn(len(Config.DatabaseTypes))]
 }
-func (this Faker) RandomDatabaseCollation() string {
-
+func (this Faker) TocliRandomDatabaseCollation() string {
+	return Config.DatabaseCollations[this.Generator.Intn(len(Config.DatabaseCollations))]
 }
-func (this Faker) RandomDatabaseEngine() string {
-
+func (this Faker) TocliRandomDatabaseEngine() string {
+	return Config.DatabaseEngines[this.Generator.Intn(len(Config.DatabaseEngines))]
 }
-func (this Faker) RandomCatchPhrase() string {
-
+func (this Faker) TocliRandomCatchPhrase() string {
+	return this.TocliRandomCatchPhraseAdjective()
 }
-func (this Faker) RandomCatchPhraseAdjective() string {
-
+func (this Faker) TocliRandomCatchPhraseAdjective() string {
+	return Config.CompanyAdjectives[this.Generator.Intn(len(Config.CompanyAdjectives))]
 }
-func (this Faker) RandomCatchPhraseDescriptor() string {
-
+func (this Faker) TocliRandomCatchPhraseDescriptor() string {
+	return Config.CompanyDescriptors[this.Generator.Intn(len(Config.CompanyDescriptors))]
 }
-func (this Faker) RandomCatchPhraseNoun() string {
-
+func (this Faker) TocliRandomCatchPhraseNoun() string {
+	return Config.CompanyNouns[this.Generator.Intn(len(Config.BusinessNouns))]
 }
-func (this Faker) RandomBsNoun() string {
-
+func (this Faker) TocliRandomBsNoun() string {
+	return Config.BusinessNouns[this.Generator.Intn(len(Config.BusinessNouns))]
 }
-func (this Faker) RandomBsBuzzWord() string {
-
+func (this Faker) TocliRandomBsBuzzWord() string {
+	return Config.BusinessVerbs[this.Generator.Intn(len(Config.BusinessVerbs))]
 }
-func (this Faker) RandomBsAdjective() string {
-
+func (this Faker) TocliRandomBsAdjective() string {
+	return Config.BusinessAdjectives[this.Generator.Intn(len(Config.BusinessAdjectives))]
 }
-func (this Faker) RandomBs() string {
-
+func (this Faker) TocliRandomBs() string {
+	return this.TocliRandomBsBuzzWord() + " " + this.TocliRandomBsAdjective() + " " + this.TocliRandomBsNoun()
 }
-func (this Faker) RandomCompanySuffix() string {
-
+func (this Faker) TocliRandomCompanySuffix() string {
+	return Config.CompanySuffixes[this.Generator.Intn(len(Config.CompanySuffixes))]
 }
-func (this Faker) RandomCompanyName() string {
-
+func (this Faker) TocliRandomCompanyName() string {
+	return Config.FirstNames[this.Generator.Intn(len(Config.FirstNames))] + " " + Config.LastNames[this.Generator.Intn(len(Config.LastNames))]
 }
-func (this Faker) RandomBitcoin() string {
-
+func (this Faker) TocliRandomBitcoin() string {
+	const Letters = "123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ"
+	B := make([]byte, this.Generator.Intn(35-26)+26)
+	for I := range B {
+		B[I] = Letters[this.Generator.Intn(len(Letters))]
+	}
+	return string(B)
 }
-func (this Faker) RandomCurrencySymbol() string {
-
+func (this Faker) TocliRandomCurrencySymbol() string {
+	return Config.CurrencySymbols[this.Generator.Intn(len(Config.CurrencySymbols))]
 }
-func (this Faker) RandomCurrencyCode() string {
-
+func (this Faker) TocliRandomCurrencyCode() string {
+	return Config.CurrencyCodes[this.Generator.Intn(len(Config.CurrencyCodes))]
 }
-func (this Faker) RandomCurrencyName() string {
-
+func (this Faker) TocliRandomCurrencyName() string {
+	return Config.CurrencyNames[this.Generator.Intn(len(Config.CurrencyNames))]
 }
-func (this Faker) RandomTransactionType() string {
-
+func (this Faker) TocliRandomTransactionType() string {
+	return Config.BankTransactionTypes[this.Generator.Intn(len(Config.BankTransactionTypes))]
 }
-func (this Faker) RandomCreditCardMask() string {
-
+func (this Faker) TocliRandomCreditCardMask() string {
+	return strconv.Itoa(this.Generator.Intn(9999-1000) + 1000)
 }
-func (this Faker) RandomBankAccountName() string {
-
+func (this Faker) TocliRandomBankAccountName() string {
+	return Config.BankAccounts[this.Generator.Intn(len(Config.BankAccounts))]
 }
 func (this Faker) RandomBankAccountBic() string {
-
+	return Config.BankAccountBics[this.Generator.Intn(len(Config.BankAccountBics))]
 }
-func (this Faker) RandomBankAccountIban() string {
-
+func (this Faker) TocliRandomBankAccountIban() string {
+	RandomBanFormat := Config.BankAccountIbans[this.Generator.Intn(len(Config.BankAccountIbans))]
+	RandomBanFormatList := strings.Split(RandomBanFormat, " ")
+	RandomIban := RandomBanFormatList[0]
+	NumberLen, _ := strconv.Atoi(RandomBanFormatList[1])
+	for I := 0; I < NumberLen; I++ {
+		RandomIban += strconv.Itoa(this.Generator.Intn(9-1) + 1)
+	}
+	return RandomIban
 }
-func (this Faker) RandomBankAccount() string {
-
+func (this Faker) TocliRandomBankAccount() string {
+	return strconv.Itoa(this.Generator.Intn(99999999-10000000) + 10000000)
 }
-func (this Faker) RandomDataImageUri() string {
-
+func (this Faker) TocliRandomDataImageUri() string {
+	return "data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20version%3D" +
+		"%221.1%22%20baseProfile%3D%22full%22%20width%3D%22undefined%22%20height%3D%22undefined%22%3E%3Crect%20width%" +
+		"3D%22100%25%22%20height%3D%22100%25%22%20fill%3D%22grey%22%2F%3E%3Ctext%20x%3D%22NaN%22%20y%3D%22NaN%22%20fo" +
+		"nt-size%3D%2220%22%20alignment-baseline%3D%22middle%22%20text-anchor%3D%22middle%22%20fill%3D%22white%22%3Eu" +
+		"ndefinedxundefined%3C%2Ftext%3E%3C%2Fsvg%3E"
 }
-func (this Faker) RandomAvatarImage() string {
-
+func (this Faker) TocliRandomAvatarImage() string {
+	return "http://placeimg.com/640/480/people"
 }
-func (this Faker) RandomImageURL() string {
-
+func (this Faker) TocliRandomImageURL() string {
+	return "http://placeimg.com/640/480"
 }
 func (this Faker) RandomAbstractImage() string {
+	return "http://placeimg.com/640/480/abstract"
+}
+func (this Faker) TocliRandomAnimalsImage() string {
+	return "http://placeimg.com/640/480/animals"
+}
+func (this Faker) TocliRandomBusinessImage() string {
+	return "http://placeimg.com/640/480/business"
+}
+func (this Faker) TocliRandomCatsImage() string {
+	return "http://placeimg.com/640/480/cats"
+}
+func (this Faker) TocliRandomCityImage() string {
+	return "http://placeimg.com/640/480/city"
+}
+func (this Faker) TocliRandomFoodImage() string {
+	return "http://placeimg.com/640/480/food"
+}
+func (this Faker) TocliRandomNightlifeImage() string {
+	return "http://placeimg.com/640/480/nightlife"
+}
+func (this Faker) TocliRandomFashionImage() string {
+	return "http://placeimg.com/640/480/fashion"
+}
+func (this Faker) TocliRandomPeopleImage() string {
+	return "http://placeimg.com/640/480/people"
+}
+func (this Faker) TocliRandomNatureImage() string {
+	return "http://placeimg.com/640/480/nature"
+}
+func (this Faker) TocliRandomSportsImage() string {
+	return "http://placeimg.com/640/480/sports"
+}
+func (this Faker) TocliRandomTransportImage() string {
+	return "http://placeimg.com/640/480/transport"
+}
+func (this Faker) TocliRandomCountryCode() string {
+	return Config.CountryCodes[this.Generator.Intn(len(Config.CountryCodes))]
+}
+func (this Faker) TocliRandomPhoneNumber() string {
+	return strconv.Itoa(this.Generator.Intn(999-100)+100) + "-" + strconv.Itoa(this.Generator.Intn(999-100)+100) + "-" + strconv.Itoa(this.Generator.Intn(9999-1000)+1000)
+}
+func (this Faker) TocliRandomPhoneNumberExt() string {
+	return strconv.Itoa(this.Generator.Intn(99-10)+10) + "-" + this.TocliRandomPhoneNumber()
+}
+func (this Faker) TocliRandomJobArea() string {
+	return Config.JobAreas[this.Generator.Intn(len(Config.JobAreas))]
+}
+func (this Faker) TocliRandomJobDescriptor() string {
+	return Config.JobDescriptors[this.Generator.Intn(len(Config.JobDescriptors))]
+}
+func (this Faker) TocliRandomJobType() string {
+	return Config.JobTypes[this.Generator.Intn(len(Config.JobTypes))]
+}
+func (this Faker) TocliRandomJobTitle() string {
+	return this.TocliRandomJobDescriptor()
+}
+func (this Faker) TocliRandomSemver() string {
+	return strconv.Itoa(this.Generator.Intn(9)) + "." + strconv.Itoa(this.Generator.Intn(9)) + strconv.Itoa(this.Generator.Intn(9))
+}
+func (this Faker) TocliRandomProtocol() string {
+	return Config.Protocols[this.Generator.Intn(len(Config.Protocols))]
+}
+func (this Faker) TocliRandomAbbreviation() string {
+	return Config.Abbreviations[this.Generator.Intn(len(Config.Abbreviations))]
+}
+func (this Faker) TocliRandomAlphanumeric() string {
+	const Letters = "abcdefghijklmnopqrstuvwxyz0123456789"
+	Seed := rand.NewSource(time.Now().UnixNano())
+	Generator := rand.New(Seed)
+	B := make([]byte, 1)
+	for I := range B {
+		B[I] = Letters[Generator.Intn(len(Letters))]
+	}
+	return string(B)
+}
+func (this Faker) TocliRandomIpv6() string {
+	Ips := []string{}
+	IPv6AlphaBet := []string{"a", "b", "c", "d", "e", "f", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"}
+
+	for J := 0; J < 8; J++ {
+		Block := ""
+		for W := 0; W < 4; W++ {
+			Block = Block + IPv6AlphaBet[this.Generator.Intn(len(IPv6AlphaBet))]
+		}
+		Ips = append(Ips, Block)
+	}
+	return strings.Join(Ips, ":")
+}
+
+func (this Faker) TocliRandomDigitNotNull() int {
+	return this.Generator.Int()%8 + 1
+}
+
+func (this Faker) TocliRandomDigit() int {
+	return this.Generator.Int() % +10
+}
+
+func (this Faker) TocliRandomFloat() float64 {
+	return this.Generator.Float64()
+}
+
+func (this Faker) TocliRandomString() string {
+	return this.TocliRandomStringMaxLenght(10)
+}
+
+func (this Faker) TocliRandomStringWithLength(I int) string {
+	R := []string{}
+	for A := 0; A < I; I++ {
+		R = append(R, this.TocliRandomLetter())
+	}
+	return strings.Join(R, "")
+}
+
+func (this Faker) TocliRandomLetter() string {
+	return fmt.Sprintf("{ %c }", this.TocliIntBetWeen(97, 122))
+}
+
+func (this Faker) TocliIntBetWeen(Min int, Max int) int {
+	Diff := Max - Min
+
+	if Diff < 0 {
+		Diff = 0
+	}
+
+	if Diff == 0 {
+		return Min
+	}
+
+	if Diff == Config.MaxInt {
+		return this.Generator.Intn(Diff)
+	}
+	return this.Generator.Intn(Diff+1) + Min
 
 }
-func (this Faker) RandomAnimalsImage() string {
 
-}
-func (this Faker) RandomBusinessImage() string {
-
-}
-func (this Faker) RandomCatsImage() string {
-
-}
-func (this Faker) RandomCityImage() string {
-
-}
-func (this Faker) RandomFoodImage() string {
-
-}
-func (this Faker) RandomNightlifeImage() string {
-
-}
-func (this Faker) RandomFashionImage() string {
-
-}
-func (this Faker) RandomPeopleImage() string {
-
-}
-func (this Faker) RandomNatureImage() string {
-
-}
-func (this Faker) RandomSportsImage() string {
-
-}
-func (this Faker) RandomTransportImage() string {
-
-}
-func (this Faker) RandomCountryCode() string {
-
-}
-func (this Faker) RandomPhoneNumber() string {
-
-}
-func (this Faker) RandomPhoneNumberExt() string {
-
-}
-func (this Faker) RandomJobArea() string {
-
-}
-func (this Faker) RandomJobDescriptor() string {
-
-}
-func (this Faker) RandomJobType() string {
-
-}
-func (this Faker) RandomJobTitle() string {
-
-}
-func (this Faker) RandomSemver() string {
-
-}
-func (this Faker) RandomProtocol() string {
-
-}
-func (this Faker) RandomAbbreviation() string {
-
-}
-func (this Faker) RandomAlphanumeric() string {
-
-}
-func (this Faker) RandomIpv6() string {
-
+func TocliNewFaker() (this Faker) {
+	Seed := rand.NewSource(time.Now().UnixNano())
+	Generator := rand.New(Seed)
+	this = Faker{Generator: Generator}
+	return
 }
