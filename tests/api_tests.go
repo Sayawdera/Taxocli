@@ -1,241 +1,258 @@
 package tests
 
-//goland:noinspection ALL
 import (
 	"Taxocli/Config"
 	"Taxocli/Core/Latency"
 	"encoding/json"
+	"log"
 	"net/http"
 	"net/http/httptest"
+	"reflect"
 	"testing"
 )
 
-func TestLatencyCheckerRUnCommandExec(t *testing.T) {
-	var (
-		Input        Latency.LatencyAPIRequest
-		OutputTokeOK = Latency.TokenAPIResponse{
-			RequestCount: 100000,
-			Duration:     100,
-		}
-		OutputTokenKOInsufficient = Latency.TokenAPIResponse{
-			RequestCount: 1,
-			Duration:     100,
-		}
-		OutputLatencyOK = Latency.LatencyCheckerOutputList{
-			Result: []Latency.LatencyCheckerOutput{
+func TestLatencyCheckerRunCommandExec(t *testing.T) {
+	var input Latency.LatencyAPIRequest
+	var outputTokenOK = Latency.TokenAPIResponse{
+		RequestCount: 100000,
+		Duration:     100,
+	}
+	var outputTokenKOInsufficient = Latency.TokenAPIResponse{
+		RequestCount: 1,
+		Duration:     100,
+	}
+
+	var outputLatencyOK = Latency.LatencyCheckerOutputList{
+		Result: []Latency.LatencyCheckerOutput{
+			{
 				Location:   "us-east-1",
 				AvgLatency: 200,
 			},
-		}
-	)
+		},
+	}
 
-	Loc := []string{"us-east-1"}
-	LocLocationDown := []string{"LocationDown"}
-	Srv := httptest.NewServer(http.HandlerFunc(func(W http.ResponseWriter, R *http.Request) {
-		if R.URL.Path == "/token" {
-			W.WriteHeader(200)
-			OutputTok, _ := json.Marshal(OutputTokeOK)
-			W.Write(OutputTok)
+	loc := []string{"us-east-1"}
+	locLocationDown := []string{"LocationDown"}
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/token" {
+			w.WriteHeader(200)
+			outputTok, _ := json.Marshal(outputTokenOK)
+			w.Write(outputTok)
+			return
+		}
+		if r.URL.Path == "/tokenInssuficient" {
+			w.WriteHeader(200)
+			output, _ := json.Marshal(outputTokenKOInsufficient)
+			w.Write(output)
+			return
+		}
+		if r.URL.Path == "/tokenBadStatusCode" {
+			w.WriteHeader(400)
+			output, _ := json.Marshal(outputTokenKOInsufficient)
+			w.Write(output)
+			return
+		}
+		if r.URL.Path == "/tokenBadJsonResponse" {
+			w.WriteHeader(400)
+			output, _ := json.Marshal("{outputTokenKOInsufficient}")
+			w.Write(output)
 			return
 		}
 
-		if R.URL.Path == "/tokenInssuficient" {
-			W.WriteHeader(200)
-			Output, _ := json.Marshal(OutputTokenKOInsufficient)
-			W.Write(Output)
-			return
-		}
+		json.NewDecoder(r.Body).Decode(&input)
+		if input.TargetURL == "https://requestOK.test" {
 
-		if R.URL.Path == "/tokenBadStatusCode" {
-			W.WriteHeader(400)
-			Output, _ := json.Marshal(OutputTokenKOInsufficient)
-			W.Write(Output)
-			return
-		}
-
-		if R.URL.Path == "/tokenBadJsonResponse" {
-			W.WriteHeader(400)
-			Output, _ := json.Marshal("{OutputTokenKOInsufficient}")
-			W.Write(Output)
-			return
-		}
-		json.NewDecoder(R.Body).Decode(&Input)
-
-		if Input.TargetURL == "https://requestOK.test" {
-
-			if Input.Locations[0] == Loc[0] {
-				W.WriteHeader(200)
-				JsonResponse := `{"us-east-1":{"avgLatency":200, "StatusCode": 200}}`
-				W.Write([]byte(JsonResponse))
+			if input.Locations[0] == loc[0] {
+				w.WriteHeader(200)
+				jsonResp := `{"us-east-1":{"latency":200,"status_code":200}}`
+				w.Write([]byte(jsonResp))
 				return
 			}
-
-			if Input.Locations[0] == LocLocationDown[0] {
-				W.WriteHeader(200)
-				JsonResponse := `{"us-east-1":{"avgLatency":200, "StatusCode": 400}}`
-				W.Write([]byte(JsonResponse))
+			if input.Locations[0] == locLocationDown[0] {
+				w.WriteHeader(200)
+				jsonResp := `{"us-east-1":{"latency":200,"status_code":400}}`
+				w.Write([]byte(jsonResp))
 				return
 			}
-			W.Write([]byte(" [ ERROR ]: "))
-			W.WriteHeader(400)
+			w.Write([]byte("error"))
+			w.WriteHeader(400)
 			return
-		}
-	}))
-	defer Srv.Close()
 
-	type Fields struct {
-		TargetURL string
-		Runs int
-		WaitInterval int
-		Locations []string
-		APIKey string
-		ContentType string
+		}
+
+	},
+	))
+
+	defer srv.Close()
+
+	type fields struct {
+		TargetUrl             string
+		Runs                  int
+		WaitInterval          int
+		Locations             []string
+		APIKey                string
+		ContentType           string
 		OutputLocationsNumber int
-		ServiceAPITokenURL string
-		ServiceAPIURL string
+		ServiceAPITokenURL    string
+		ServiceAPIURL         string
 	}
 	tests := []struct {
-		Name string
-		Fields Fields
-		Want Latency.LatencyCheckerOutputList
-		WantError bool
-	} {
+		name    string
+		fields  fields
+		want    Latency.LatencyCheckerOutputList
+		wantErr bool
+	}{
 		{
-			Name: "Test OK Executing The Function With No Errors",
-			Fields: Fields{
-				TargetURL: "https://requestOK.test",
-				Runs: 1,
-				WaitInterval: 1,
-				Locations: []string{"us-east-1", "us-west-1"},
-				APIKey: "API KEY",
-				ContentType: Config.TAXOCLI_CONTENT_TYPE_REQ,
+			name: "Test OK executing the funtion with no errors",
+			fields: fields{
+				TargetUrl:             "https://requestOK.test",
+				Runs:                  1,
+				WaitInterval:          1,
+				Locations:             []string{"us-east-1", "us-west-1"},
+				APIKey:                "APIKEY",
+				ContentType:           Config.TAXOCLI_CONTENT_TYPE_REQ,
 				OutputLocationsNumber: 1,
-				ServiceAPITokenURL: Srv.URL + "/token",
-				ServiceAPIURL: Srv.URL,
+				ServiceAPITokenURL:    srv.URL + "/token",
+				ServiceAPIURL:         srv.URL,
 			},
-			Want: OutputLatencyOK,
-			WantError: false,
+			want:    outputLatencyOK,
+			wantErr: false,
 		},
 		{
-			Name: "Test OK Executing The Function With No Errors, Multiple Runs",
-			Fields: Fields{
-				TargetURL: "https://requestOK.test",
-				Runs: 2,
-				WaitInterval: 1,
-				Locations: []string{"us-east-1", "us-west-1"},
-				APIKey: "API KEY",
-				ContentType: Config.TAXOCLI_CONTENT_TYPE_REQ,
+			name: "Test OK executing the funtion with no errors, multiples runs",
+			fields: fields{
+				TargetUrl:             "https://requestOK.test",
+				Runs:                  2,
+				WaitInterval:          1,
+				Locations:             []string{"us-east-1", "us-west-1"},
+				APIKey:                "APIKEY",
+				ContentType:           Config.TAXOCLI_CONTENT_TYPE_REQ,
 				OutputLocationsNumber: 1,
-				ServiceAPITokenURL: Srv.URL + "/token",
-				ServiceAPIURL: Srv.URL,
+				ServiceAPITokenURL:    srv.URL + "/token",
+				ServiceAPIURL:         srv.URL,
 			},
-			Want: OutputLatencyOK,
-			WantError: false,
+			want:    outputLatencyOK,
+			wantErr: false,
 		},
 		{
-			Name: "Test KO To Test Errors In AvailableTokens",
-			Fields: Fields{
-				TargetURL: "https://requestOK.test",
-				Runs: 1,
-				WaitInterval: 1,
-				Locations: []string{"us-east-1", "us-west-1"},
-				APIKey: "API KEY",
-				ContentType: Config.TAXOCLI_CONTENT_TYPE_REQ,
+			name: "Test KO to test errors in availableTokens",
+			fields: fields{
+				TargetUrl:             "https://requestOK.test",
+				Runs:                  1,
+				WaitInterval:          1,
+				Locations:             []string{"us-east-1", "us-west-1"},
+				APIKey:                "APIKEY",
+				ContentType:           Config.TAXOCLI_CONTENT_TYPE_REQ,
 				OutputLocationsNumber: 1,
-				ServiceAPITokenURL: Srv.URL + "/token",
-				ServiceAPIURL: Srv.URL,
+				ServiceAPITokenURL:    srv.URL + "/tokenInssuficient",
+				ServiceAPIURL:         srv.URL,
 			},
-			Want: Latency.LatencyCheckerOutputList{},
-			WantError: false,
+			want:    Latency.LatencyCheckerOutputList{},
+			wantErr: true,
 		},
 		{
-			Name: "Test KO To Test Errors In AvailableTokens",
-			Fields: Fields{
-				TargetURL: "https://requestKO.test",
-				Runs: 1,
-				WaitInterval: 1,
-				Locations: []string{"us-east-1", "us-west-1"},
-				APIKey: "API KEY",
-				ContentType: Config.TAXOCLI_CONTENT_TYPE_REQ,
+			name: "Test KO to test errors in APIKEY",
+			fields: fields{
+				TargetUrl:             "https://requestOK.test",
+				Runs:                  1,
+				WaitInterval:          1,
+				Locations:             []string{"us-east-1", "us-west-1"},
+				APIKey:                "NOT_SET",
+				ContentType:           Config.TAXOCLI_CONTENT_TYPE_REQ,
 				OutputLocationsNumber: 1,
-				ServiceAPITokenURL: Srv.URL + "/token",
-				ServiceAPIURL: Srv.URL,
+				ServiceAPITokenURL:    srv.URL + "/token",
+				ServiceAPIURL:         srv.URL,
 			},
-			Want: Latency.LatencyCheckerOutputList{},
-			WantError: true,
+			want:    Latency.LatencyCheckerOutputList{},
+			wantErr: true,
 		},
 		{
-			Name: "Test OK Executing The Function With No Errors",
-			Fields: Fields{
-				TargetURL: "https://requestOK.test",
-				Runs: 1,
-				WaitInterval: 1,
-				Locations: []string{"us-east-1", "us-west-1"},
-				APIKey: "API KEY",
-				ContentType: Config.TAXOCLI_CONTENT_TYPE_REQ,
+			name: "Test KO to test errors in StatusCode Response",
+			fields: fields{
+				TargetUrl:             "https://requestOK.test",
+				Runs:                  1,
+				WaitInterval:          1,
+				Locations:             []string{"us-east-1", "us-west-1"},
+				APIKey:                "APIKEY",
+				ContentType:           Config.TAXOCLI_CONTENT_TYPE_REQ,
 				OutputLocationsNumber: 1,
-				ServiceAPITokenURL: Srv.URL + "/token",
-				ServiceAPIURL: Srv.URL,
+				ServiceAPITokenURL:    srv.URL + "/tokenBadStatusCode",
+				ServiceAPIURL:         srv.URL,
 			},
-			Want: Latency.LatencyCheckerOutputList{},
-			WantError: false,
+			want:    Latency.LatencyCheckerOutputList{},
+			wantErr: true,
 		},
 		{
-			Name: "Test OK Executing The Function With No Errors",
-			Fields: Fields{
-				TargetURL: "https://requestOK.test",
-				Runs: 1,
-				WaitInterval: 1,
-				Locations: []string{"us-east-1", "us-west-1"},
-				APIKey: "API KEY",
-				ContentType: Config.TAXOCLI_CONTENT_TYPE_REQ,
+			name: "Test KO to test errors in Json unmarshal decode",
+			fields: fields{
+				TargetUrl:             "https://requestOK.test",
+				Runs:                  1,
+				WaitInterval:          1,
+				Locations:             []string{"us-east-1", "us-west-1"},
+				APIKey:                "APIKEY",
+				ContentType:           Config.TAXOCLI_CONTENT_TYPE_REQ,
 				OutputLocationsNumber: 1,
-				ServiceAPITokenURL: Srv.URL + "/token",
-				ServiceAPIURL: Srv.URL,
+				ServiceAPITokenURL:    srv.URL + "/tokenBadJsonResponse",
+				ServiceAPIURL:         srv.URL,
 			},
-			Want: Latency.LatencyCheckerOutputList{},
-			WantError: false,
+			want:    Latency.LatencyCheckerOutputList{},
+			wantErr: true,
 		},
 		{
-			Name: "Test OK Executing The Function With No Errors",
-			Fields: Fields{
-				TargetURL: "https://requestOK.test",
-				Runs: 1,
-				WaitInterval: 1,
-				Locations: []string{"us-east-1", "us-west-1"},
-				APIKey: "API KEY",
-				ContentType: Config.TAXOCLI_CONTENT_TYPE_REQ,
+			name: "Test KO to test errors with Bad location",
+			fields: fields{
+				TargetUrl:             "https://requestOK.test",
+				Runs:                  1,
+				WaitInterval:          1,
+				Locations:             []string{"badlocation"},
+				APIKey:                "APIKEY",
+				ContentType:           Config.TAXOCLI_CONTENT_TYPE_REQ,
 				OutputLocationsNumber: 1,
-				ServiceAPITokenURL: Srv.URL + "/token",
-				ServiceAPIURL: Srv.URL,
+				ServiceAPITokenURL:    srv.URL + "/token",
+				ServiceAPIURL:         srv.URL,
 			},
-			Want: Latency.LatencyCheckerOutputList{},
-			WantError: false,
-		}
-
-		for _, TT := range tests {
-			t.Run(TT.Name, func(t *testing.T) {
-				this := &LatencyChecker{
-					TargetUrl:             TT.FIelds.TargetURL,
-					Runs:                  TT.FIelds.Runs,
-					WaitInterval:          TT.FIelds.WaitInterval,
-					Locations:             TT.FIelds.Locations,
-					APIKey:                TT.FIelds.APIKey,
-					ContentType:           TT.FIelds.ContentType,
-					OutputLocationsNumber: TT.FIelds.OutputLocationsNumber,
-					ServiceAPITokenURL:    TT.FIelds.ServiceAPITokenURL,
-					ServiceAPIURL:         TT.FIelds.ServiceAPIURL,
-				}
-				log.Println(this.locations)
-				Got, err := this.RunCommandExec(
-					if (err != nil) != TT.WantError {
-						t.Errorf("RunCommandExec() Error = { %v } WatnError { %v }", err, TT.WantError)
-					}
-					if !reflect.DeepEqual(Got, TT.Want) {
-						t.Errrof("RunCommandExec() = { %v } Want { %v }", Got, TT.Want)
-					}
-				)
-			})
-		}
-	},
+			want:    Latency.LatencyCheckerOutputList{},
+			wantErr: true,
+		},
+		/*{
+			name: "Test KO to test errors with Down Location (status code != 200)",
+			fields: fields{
+				TargetUrl:             "https://requestOK.test",
+				Runs:                  1,
+				WaitInterval:          1,
+				Locations:             []string{"LocationDown"},
+				APIKey:                "APIKEY",
+				ContentType:           CONTENT_TYPE_REQ,
+				OutputLocationsNumber: 1,
+				ServiceAPITokenURL:    srv.URL + "/token",
+				ServiceAPIURL:         srv.URL,
+			},
+			want:    outputLatencyOK,
+			wantErr: true,
+		},*/
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			lc := &Latency.LatencyChecker{
+				TargetUrl:             tt.fields.TargetUrl,
+				Runs:                  tt.fields.Runs,
+				WaitInterval:          tt.fields.WaitInterval,
+				Locations:             tt.fields.Locations,
+				APIKey:                tt.fields.APIKey,
+				ContentType:           tt.fields.ContentType,
+				OutputLocationsNumber: tt.fields.OutputLocationsNumber,
+				ServiceAPITokenURL:    tt.fields.ServiceAPITokenURL,
+				ServiceAPIURL:         tt.fields.ServiceAPIURL,
+			}
+			log.Println(lc.Locations)
+			got, err := lc.RunCommandExec()
+			if (err != nil) != tt.wantErr {
+				t.Errorf("RunCommandExec() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("RunCommandExec() got = %v, want %v", got, tt.want)
+			}
+		})
+	}
 }

@@ -14,6 +14,15 @@ const (
 )
 
 var (
+	TARGET_URL              string
+	NUMBER_OF_RUNS          int
+	WAIT_INTERVAL           string
+	LOCATIONS               []string
+	OUTPUT_LOCATIONS_NUMBER int
+	OUTPUT_FORMAT           string
+)
+
+var (
 	JobDescriptors = []string{
 		"Lead", "Senior", "Direct", "Corporate", "Dynamic", "Future", "Product", "National", "Regional", "District",
 		"Central", "Global", "Customer", "Investor", "Dynamic", "International", "Legacy", "Forward", "Internal", "Human",
